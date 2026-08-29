@@ -36,8 +36,7 @@ export function createUpdaterController(input: {
   }
 
   const check = () => {
-    if (!input.enabled) return Promise.resolve(state)
-    if (state.status === "ready") return Promise.resolve(state)
+    if (!input.enabled || state.status === "ready") return Promise.resolve(state)
     if (pending) return pending
 
     pending = (async () => {

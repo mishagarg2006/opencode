@@ -60,6 +60,14 @@ describe("updater controller", () => {
     expect(calls).toEqual([])
   })
 
+  test("does not check again when an update is ready", async () => {
+    const app = setup()
+    await app.controller.check()
+
+    await expect(app.controller.check()).resolves.toEqual({ status: "ready", version: "2.0.0" })
+    expect(app.calls).toEqual(["check", "download"])
+  })
+
   test("checks, downloads, persists, and publishes one authoritative ready state", async () => {
     const app = setup()
     const states: ReturnType<typeof app.controller.getState>[] = []
@@ -71,14 +79,6 @@ describe("updater controller", () => {
     expect(app.getReady()).toEqual({ version: "2.0.0" })
     expect(states.map((state) => state.status)).toEqual(["idle", "checking", "downloading", "ready"])
     expect(app.controller.getState()).toEqual({ status: "ready", version: "2.0.0" })
-  })
-
-  test("does not check again when an update is ready", async () => {
-    const app = setup()
-    await app.controller.check()
-
-    await expect(app.controller.check()).resolves.toEqual({ status: "ready", version: "2.0.0" })
-    expect(app.calls).toEqual(["check", "download"])
   })
 
   test("revalidates a persisted target through the updater cache on launch", async () => {
